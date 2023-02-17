@@ -12,5 +12,14 @@ services:
       - '3306'
     volumes:
       - db:/var/lib/mysql
+  application:
+    container_name: ${APPLICATION_CONTAINER}
+    build: ../
+    ports:
+      - '8080:8080'
+    expose:
+      - '8080'
+    profiles:
+      - app
 volumes:
   db:

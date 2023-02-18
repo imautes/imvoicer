@@ -3,10 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <title>Client API</title>
+  <link rel="stylesheet" type="text/css" href="styles.css">
 </head>
 <body>
-  <a href="/swagger-ui.html">Swagger UI</a>
-  <a href="/actuator">Actuator</a>
-  <a href="/actuator/prometheus">Prometheus</a>
+  <h1 id="title">Client API</h1>
+  <div id="nav">
+    <button onclick="location.href = '/swagger-ui.html'" class="button green">Swagger UI</button>
+    <button onclick="location.href = '/actuator'" class="button red">Actuator</button>
+    <button onclick="location.href = '/actuator/prometheus'" class="button">Prometheus</button>
+  </div>
 </body>
 </html>

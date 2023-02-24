@@ -1,0 +1,18 @@
+version: '3.8'
+services:
+  prometheus:
+    container_name: ${PROMETHEUS_CONTAINER}
+    build: ./prometheus
+    restart: always
+    ports:
+      - '9090:9090'
+    expose:
+      - '9090'
+  grafana:
+    container_name: ${GRAFANA_CONTAINER}
+    build: ./grafana
+    restart: always
+    ports:
+      - '3000:3000'
+    expose:
+      - '3000'

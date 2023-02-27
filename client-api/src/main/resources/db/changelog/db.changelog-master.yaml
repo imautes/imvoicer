@@ -1,0 +1,7 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: imosonyi
+  - include:
+      file: client/001-create-client-table.sql
+      relativeToChangelogFile: true

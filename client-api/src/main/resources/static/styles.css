@@ -43,6 +43,10 @@ html, body {
   background-image: linear-gradient(92.88deg, #b55e45 9.16%, #cc4356 43.89%, #d73f67 64.72%);
 }
 
+.button.orange {
+  background-image: linear-gradient(92.88deg, #b58845 9.16%, #cc8c43 43.89%, #d77e3f 64.72%);
+}
+
 .button:hover {
   box-shadow: rgba(80, 63, 205, 0.5) 0 1px 30px;
   transition-duration: .1s;
@@ -52,8 +56,10 @@ html, body {
     box-shadow: rgba(80, 205, 63, 0.5) 0 1px 30px;
 }
 
-
 .button.red:hover {
     box-shadow: rgba(205, 63, 80, 0.5) 0 1px 30px;
 }
 
+.button.orange:hover {
+  box-shadow: rgba(205, 134, 63, 0.5) 0 1px 30px;
+}

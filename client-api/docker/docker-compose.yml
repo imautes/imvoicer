@@ -7,18 +7,20 @@ services:
     image: mysql
     restart: always
     ports:
-      - '3306:3306'
+      - '${MYSQL_PORT}:3306'
     expose:
-      - '3306'
+      - '${MYSQL_PORT}'
     volumes:
       - db:/var/lib/mysql
   application:
+    env_file:
+      - app.env
     container_name: ${APPLICATION_CONTAINER}
     build: ../
     ports:
-      - '8080:8080'
+      - '${APPLICATION_PORT}:8080'
     expose:
-      - '8080'
+      - '${APPLICATION_PORT}'
     profiles:
       - app
 volumes:

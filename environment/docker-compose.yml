@@ -5,7 +5,7 @@ services:
     build: ./prometheus
     restart: always
     ports:
-      - '9090:9090'
+      - '${PROMETHEUS_PORT}:9090'
     expose:
       - '9090'
   grafana:
@@ -13,6 +13,14 @@ services:
     build: ./grafana
     restart: always
     ports:
-      - '3000:3000'
+      - '${GRAFANA_PORT}:3000'
     expose:
       - '3000'
+  sonarqube:
+    container_name: ${SONARQUBE_CONTAINER}
+    build: ./sonarqube
+    restart: always
+    ports:
+      - '${SONARQUBE_PORT}:9000'
+    expose:
+      - '9000'

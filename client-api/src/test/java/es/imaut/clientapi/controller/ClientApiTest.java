@@ -1,7 +1,7 @@
 package es.imaut.clientapi.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import es.imaut.clientapi.domain.ClientDetails;
+import es.imaut.clientapi.domain.ClientResponse;
 import es.imaut.clientapi.domain.CreateClientRequest;
 import io.github.glytching.junit.extension.random.Random;
 import io.github.glytching.junit.extension.random.RandomBeansExtension;
@@ -62,12 +62,12 @@ class ClientApiTest {
     })
     void getClientsShouldReturnClientsFromDatabase() throws JsonProcessingException {
         webClient.get().uri(clientsUrl.get()).exchange()
-                .expectBodyList(ClientDetails.class)
+                .expectBodyList(ClientResponse.class)
                 .hasSize(3)
                 .contains(
-                        new ClientDetails(1L, "Client 1"),
-                        new ClientDetails(2L, "Client 2"),
-                        new ClientDetails(3L, "Client 3")
+                        new ClientResponse(1L, "Client 1"),
+                        new ClientResponse(2L, "Client 2"),
+                        new ClientResponse(3L, "Client 3")
                 );
     }
 
@@ -117,7 +117,7 @@ class ClientApiTest {
     @Sql(executionPhase = AFTER_TEST_METHOD, scripts = {"cleanClientTable.sql"})
     void postClientsShouldReturnClientFromDatabase(@Random CreateClientRequest request) {
         var response = webClient.post().uri(clientsUrl.get()).bodyValue(request).exchange()
-                .expectBody(ClientDetails.class)
+                .expectBody(ClientResponse.class)
                 .returnResult().getResponseBody();
         assertThat(response).hasNoNullFieldsOrProperties()
                 .hasFieldOrPropertyWithValue("name", request.getName());
@@ -129,7 +129,7 @@ class ClientApiTest {
     void getClientsShouldReturnClientCreatedFromPostClients(@Random CreateClientRequest request) {
         webClient.post().uri(clientsUrl.get()).bodyValue(request).exchange();
         var response = webClient.get().uri(clientsUrl.get()).exchange()
-                .expectBodyList(ClientDetails.class)
+                .expectBodyList(ClientResponse.class)
                 .hasSize(1)
                 .returnResult().getResponseBody();
         assertThat(response).asList()

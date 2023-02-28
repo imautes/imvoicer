@@ -1,7 +1,7 @@
 package es.imaut.clientapi.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import es.imaut.clientapi.domain.ClientDetails;
+import es.imaut.clientapi.domain.ClientResponse;
 import es.imaut.clientapi.domain.CreateClientRequest;
 import es.imaut.clientapi.service.ClientService;
 import io.github.glytching.junit.extension.random.Random;
@@ -41,7 +41,7 @@ class ClientControllerWebLayerTest {
 
     @Test
     @DisplayName("GET /clients should return clients from service")
-    void getClientsShouldReturnClientsFromService(@Random(type = ClientDetails.class) List<ClientDetails> clients) throws Exception {
+    void getClientsShouldReturnClientsFromService(@Random(type = ClientResponse.class) List<ClientResponse> clients) throws Exception {
         when(service.findAll()).thenReturn(clients);
         var result = mvc.perform(get("/clients")).andReturn();
         assertThat(result.getResponse().getContentAsString())
@@ -82,7 +82,7 @@ class ClientControllerWebLayerTest {
 
     @Test
     @DisplayName("POST /clients should return client from service")
-    void postClientsShouldReturnClientFromService(@Random CreateClientRequest body, @Random ClientDetails details) throws Exception {
+    void postClientsShouldReturnClientFromService(@Random CreateClientRequest body, @Random ClientResponse details) throws Exception {
         details.setName(body.getName());
         when(service.create(body)).thenReturn(details);
         var request = post("/clients")

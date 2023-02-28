@@ -1,6 +1,6 @@
 package es.imaut.clientapi.controller;
 
-import es.imaut.clientapi.domain.ClientDetails;
+import es.imaut.clientapi.domain.ClientResponse;
 import es.imaut.clientapi.domain.CreateClientRequest;
 import es.imaut.clientapi.service.ClientService;
 import jakarta.validation.Valid;
@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.json.JsonMergePatch;
 import java.util.List;
 
 import static org.springframework.http.ResponseEntity.ok;
@@ -19,12 +20,17 @@ public class ClientController {
     private final ClientService service;
 
     @GetMapping
-    public ResponseEntity<List<ClientDetails>> findAll() {
+    public ResponseEntity<List<ClientResponse>> findAll() {
         return ok(service.findAll());
     }
 
     @PostMapping
-    public ResponseEntity<ClientDetails> create(@Valid @RequestBody CreateClientRequest request) {
+    public ResponseEntity<ClientResponse> create(@Valid @RequestBody CreateClientRequest request) {
         return ok(service.create(request));
+    }
+
+    @PatchMapping(path = "/{id}", consumes = "application/merge-patch+json")
+    public ResponseEntity<ClientResponse> update(@PathVariable Long id, @RequestBody JsonMergePatch patch) {
+        return ok(service.update(id, patch));
     }
 }

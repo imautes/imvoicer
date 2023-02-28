@@ -1,6 +1,6 @@
 package es.imaut.clientapi.controller;
 
-import es.imaut.clientapi.domain.ClientDetails;
+import es.imaut.clientapi.domain.ClientResponse;
 import es.imaut.clientapi.domain.CreateClientRequest;
 import es.imaut.clientapi.service.ClientService;
 import io.github.glytching.junit.extension.random.Random;
@@ -43,7 +43,7 @@ class ClientControllerTest {
 
     @Test
     @DisplayName("Find all should return clients from service")
-    void findAllShouldReturnClientsFromService(@Random(type = ClientDetails.class) List<ClientDetails> clients) {
+    void findAllShouldReturnClientsFromService(@Random(type = ClientResponse.class) List<ClientResponse> clients) {
         when(service.findAll()).thenReturn(clients);
         var result = controller.findAll();
         assertThat(result.getBody()).asList().hasSameSizeAs(clients)
@@ -66,7 +66,7 @@ class ClientControllerTest {
 
     @Test
     @DisplayName("Create should return client from service")
-    void createShouldReturnClientFromService(@Random CreateClientRequest request, @Random ClientDetails details) {
+    void createShouldReturnClientFromService(@Random CreateClientRequest request, @Random ClientResponse details) {
         details.setName(request.getName());
         when(service.create(argThat(request::equals)))
                 .thenReturn(details);

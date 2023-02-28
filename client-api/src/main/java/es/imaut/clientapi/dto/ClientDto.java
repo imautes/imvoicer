@@ -1,4 +1,4 @@
-package es.imaut.clientapi.domain;
+package es.imaut.clientapi.dto;
 
 import lombok.Data;
 

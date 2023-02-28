@@ -1,6 +1,6 @@
 package es.imaut.clientapi.controller;
 
-import es.imaut.clientapi.domain.ClientDto;
+import es.imaut.clientapi.dto.ClientDto;
 import es.imaut.clientapi.service.ClientService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

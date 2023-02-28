@@ -18,6 +18,7 @@ public class Client {
     private String name;
 
     @Override
+    @Generated
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
@@ -26,6 +27,7 @@ public class Client {
     }
 
     @Override
+    @Generated
     public int hashCode() {
         return getClass().hashCode();
     }

@@ -1,6 +1,6 @@
 package es.imaut.clientapi.service;
 
-import es.imaut.clientapi.domain.ClientDto;
+import es.imaut.clientapi.dto.ClientDto;
 import es.imaut.clientapi.mapper.ClientDtoMapper;
 import es.imaut.clientapi.repository.ClientRepository;
 import lombok.RequiredArgsConstructor;

@@ -1,7 +1,8 @@
 package es.imaut.clientapi.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import es.imaut.clientapi.dto.ClientDto;
+import es.imaut.clientapi.domain.ClientDetails;
+import es.imaut.clientapi.domain.CreateClientRequest;
 import es.imaut.clientapi.service.ClientService;
 import io.github.glytching.junit.extension.random.Random;
 import io.github.glytching.junit.extension.random.RandomBeansExtension;
@@ -18,6 +19,7 @@ import java.util.List;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = { ClientController.class })
@@ -33,16 +35,61 @@ class ClientControllerWebLayerTest {
     @Test
     @DisplayName("GET /clients should return 200 OK")
     void getClientsShouldReturn200Ok() throws Exception {
-        mvc.perform(get("/clients").content("application/json"))
+        mvc.perform(get("/clients"))
                 .andExpect(status().isOk());
     }
 
     @Test
     @DisplayName("GET /clients should return clients from service")
-    void getClientsShouldReturnClientsFromService(@Random(type = ClientDto.class) List<ClientDto> clients) throws Exception {
+    void getClientsShouldReturnClientsFromService(@Random(type = ClientDetails.class) List<ClientDetails> clients) throws Exception {
         when(service.findAll()).thenReturn(clients);
-        var result = mvc.perform(get("/clients").content("application/json")).andReturn();
+        var result = mvc.perform(get("/clients")).andReturn();
         assertThat(result.getResponse().getContentAsString())
                 .isEqualToIgnoringWhitespace(mapper.writeValueAsString(clients));
+    }
+
+    @Test
+    @DisplayName("POST /clients should return 200 OK")
+    void postClientsShouldReturn200Ok(@Random CreateClientRequest body) throws Exception {
+        var request = post("/clients")
+                .contentType("application/json")
+                .content(mapper.writeValueAsString(body));
+        mvc.perform(request).andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("POST /clients should return 400 Bad Request")
+    void postClientsShouldReturn400BadRequest() throws Exception {
+        var request = post("/clients")
+                .contentType("application/json")
+                .content(mapper.writeValueAsString(new CreateClientRequest()));
+        mvc.perform(request).andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("POST /clients should ignore unknown fields")
+    void postClientsShouldIgnoreUnknownFields() throws Exception {
+        var body = """
+                {
+                  "name": "Name",
+                  "ignored": "field"
+                }""";
+        var request = post("/clients")
+                .contentType("application/json")
+                .content(body);
+        mvc.perform(request).andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("POST /clients should return client from service")
+    void postClientsShouldReturnClientFromService(@Random CreateClientRequest body, @Random ClientDetails details) throws Exception {
+        details.setName(body.getName());
+        when(service.create(body)).thenReturn(details);
+        var request = post("/clients")
+                .contentType("application/json")
+                .content(mapper.writeValueAsString(body));
+        var result = mvc.perform(request).andReturn();
+        assertThat(result.getResponse().getContentAsString())
+                .isEqualToIgnoringWhitespace(mapper.writeValueAsString(details));
     }
 }

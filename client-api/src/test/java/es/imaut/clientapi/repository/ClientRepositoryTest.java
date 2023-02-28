@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -19,6 +21,7 @@ import static org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTest
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = NONE)
 @ExtendWith({ RandomBeansExtension.class })
+@ActiveProfiles("test")
 class ClientRepositoryTest {
     @Autowired
     private TestEntityManager entityManager;
@@ -36,7 +39,7 @@ class ClientRepositoryTest {
     @Test
     @DisplayName("Find all should return all clients")
     void findAllShouldReturnAllClients(@Random(type = Client.class) List<Client> clients) {
-        clients.forEach(entityManager::persist);
+        clients.stream().peek(c -> c.setId(null)).forEach(entityManager::persist);
         var result = repository.findAll();
         assertThat(result).isNotNull()
                 .asList().hasSameSizeAs(clients)

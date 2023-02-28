@@ -1,12 +1,12 @@
 package es.imaut.clientapi.controller;
 
-import es.imaut.clientapi.dto.ClientDto;
+import es.imaut.clientapi.domain.ClientDetails;
+import es.imaut.clientapi.domain.CreateClientRequest;
 import es.imaut.clientapi.service.ClientService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -19,7 +19,12 @@ public class ClientController {
     private final ClientService service;
 
     @GetMapping
-    public ResponseEntity<List<ClientDto>> findAll() {
+    public ResponseEntity<List<ClientDetails>> findAll() {
         return ok(service.findAll());
+    }
+
+    @PostMapping
+    public ResponseEntity<ClientDetails> create(@Valid @RequestBody CreateClientRequest request) {
+        return ok(service.create(request));
     }
 }

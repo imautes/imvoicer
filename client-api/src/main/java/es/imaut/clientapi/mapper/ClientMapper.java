@@ -15,7 +15,7 @@ public abstract class ClientMapper {
     @Autowired
     private ObjectMapper objectMapper;
 
-    public abstract Client merge(CreateClientRequest request);
+    public abstract Client from(CreateClientRequest request);
 
     public Client merge(JsonMergePatch request, @MappingTarget Client client) {
         var clientJson = objectMapper.convertValue(client, JsonValue.class);

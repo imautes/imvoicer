@@ -24,6 +24,11 @@ public class ClientController {
         return ok(service.findAll());
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<ClientResponse> findById(@PathVariable Long id) {
+        return ok(service.findById(id));
+    }
+
     @PostMapping
     public ResponseEntity<ClientResponse> create(@Valid @RequestBody CreateClientRequest request) {
         return ok(service.create(request));
@@ -32,5 +37,11 @@ public class ClientController {
     @PatchMapping(path = "/{id}", consumes = "application/merge-patch+json")
     public ResponseEntity<ClientResponse> update(@PathVariable Long id, @RequestBody JsonMergePatch patch) {
         return ok(service.update(id, patch));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        service.delete(id);
+        return ok().build();
     }
 }

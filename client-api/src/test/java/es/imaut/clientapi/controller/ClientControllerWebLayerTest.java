@@ -3,6 +3,7 @@ package es.imaut.clientapi.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import es.imaut.clientapi.domain.ClientResponse;
 import es.imaut.clientapi.domain.CreateClientRequest;
+import es.imaut.clientapi.exception.ClientNotFoundException;
 import es.imaut.clientapi.service.ClientService;
 import io.github.glytching.junit.extension.random.Random;
 import io.github.glytching.junit.extension.random.RandomBeansExtension;
@@ -14,12 +15,13 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import javax.json.JsonMergePatch;
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = { ClientController.class })
@@ -46,6 +48,31 @@ class ClientControllerWebLayerTest {
         var result = mvc.perform(get("/clients")).andReturn();
         assertThat(result.getResponse().getContentAsString())
                 .isEqualToIgnoringWhitespace(mapper.writeValueAsString(clients));
+    }
+
+    @Test
+    @DisplayName("GET /clients/{id} should return 404 Not found")
+    void getClientsIdShouldReturn404NotFound() throws Exception {
+        when(service.findById(1L)).thenThrow(new ClientNotFoundException());
+        mvc.perform(get("/clients/1"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("GET /clients/{id} should return 200 OK")
+    void getClientsIdShouldReturn200Ok(@Random ClientResponse response) throws Exception {
+        when(service.findById(response.getId())).thenReturn(response);
+        mvc.perform(get("/clients/" + response.getId()))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("GET /clients/{id} should return client from service")
+    void getClientsIdShouldReturnClientFromService(@Random ClientResponse response) throws Exception {
+        when(service.findById(response.getId())).thenReturn(response);
+        var result = mvc.perform(get("/clients/" + response.getId())).andReturn();
+        assertThat(result.getResponse().getContentAsString())
+                .isEqualToIgnoringWhitespace(mapper.writeValueAsString(response));
     }
 
     @Test
@@ -82,14 +109,70 @@ class ClientControllerWebLayerTest {
 
     @Test
     @DisplayName("POST /clients should return client from service")
-    void postClientsShouldReturnClientFromService(@Random CreateClientRequest body, @Random ClientResponse details) throws Exception {
-        details.setName(body.getName());
-        when(service.create(body)).thenReturn(details);
+    void postClientsShouldReturnClientFromService(@Random CreateClientRequest body, @Random ClientResponse response) throws Exception {
+        response.setName(body.getName());
+        when(service.create(body)).thenReturn(response);
         var request = post("/clients")
                 .contentType("application/json")
                 .content(mapper.writeValueAsString(body));
         var result = mvc.perform(request).andReturn();
         assertThat(result.getResponse().getContentAsString())
-                .isEqualToIgnoringWhitespace(mapper.writeValueAsString(details));
+                .isEqualToIgnoringWhitespace(mapper.writeValueAsString(response));
+    }
+
+    @Test
+    @DisplayName("PATCH /clients/{id} should return 404 Not found")
+    void patchClientsIdShouldReturn404NotFound() throws Exception {
+        when(service.update(anyLong(), any(JsonMergePatch.class))).thenThrow(new ClientNotFoundException());
+        var request = patch("/clients/1")
+                .contentType("application/merge-patch+json")
+                .content("{}");
+        mvc.perform(request)
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("PATCH /clients/{id} should return 200 OK")
+    void patchClientsIdShouldReturn200Ok(@Random ClientResponse response) throws Exception {
+        when(service.update(eq(response.getId()), any(JsonMergePatch.class))).thenReturn(response);
+        var request = patch("/clients/" + response.getId())
+                .contentType("application/merge-patch+json")
+                .content("{}");
+        mvc.perform(request)
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("PATCH /clients/{id} should ignore unknown fields")
+    void patchClientsIdShouldIgnoreUnknownFields(@Random ClientResponse response) throws Exception {
+        when(service.update(eq(response.getId()), any(JsonMergePatch.class))).thenReturn(response);
+        var request = patch("/clients/" + response.getId())
+                .contentType("application/merge-patch+json")
+                .content("""
+                        {
+                          "ignored": "field"
+                        }
+                        """);
+        mvc.perform(request)
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("PATCH /clients/{id} should return client from service")
+    void patchClientsIdShouldReturnClientFromService(@Random ClientResponse response) throws Exception {
+        when(service.update(eq(response.getId()), any(JsonMergePatch.class))).thenReturn(response);
+        var request = patch("/clients/" + response.getId())
+                .contentType("application/merge-patch+json")
+                .content("{}");
+        var result = mvc.perform(request).andReturn();
+        assertThat(result.getResponse().getContentAsString())
+                .isEqualToIgnoringWhitespace(mapper.writeValueAsString(response));
+    }
+
+    @Test
+    @DisplayName("DELETE /clients/{id} should return 200 OK")
+    void deleteClientsIdShouldReturn200Ok() throws Exception {
+        mvc.perform(delete("/clients/1"))
+                .andExpect(status().isOk());
     }
 }

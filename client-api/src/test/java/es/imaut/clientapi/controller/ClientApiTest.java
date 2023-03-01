@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlGroup;
@@ -38,6 +39,7 @@ class ClientApiTest {
     @Autowired
     private WebTestClient webClient;
     private final Supplier<String> clientsUrl = () -> url.apply(port) + "/clients";
+    private final Supplier<String> clientsIdUrl = () -> url.apply(port) + "/clients/%d";
 
     @Test
     @DisplayName("IT: GET /clients should return 200 OK")
@@ -69,6 +71,39 @@ class ClientApiTest {
                         new ClientResponse(2L, "Client 2"),
                         new ClientResponse(3L, "Client 3")
                 );
+    }
+
+    @Test
+    @DisplayName("IT: GET /clients/{id} should return 404 Not found")
+    void getClientsIdShouldReturn404NotFound() {
+        webClient.get().uri(clientsIdUrl.get().formatted(1L)).exchange()
+                .expectStatus().isNotFound();
+    }
+
+    @Test
+    @DisplayName("IT: GET /clients/{id} should return 200 OK")
+    @SqlGroup({
+            @Sql(executionPhase = BEFORE_TEST_METHOD, scripts = {"getClientsIdShouldReturn200Ok.sql"}),
+            @Sql(executionPhase = AFTER_TEST_METHOD, scripts = {"cleanClientTable.sql"})
+    })
+    void getClientsIdShouldReturn200Ok() {
+        webClient.get().uri(clientsIdUrl.get().formatted(1L)).exchange()
+                .expectStatus().isOk();
+    }
+
+    @Test
+    @DisplayName("IT: GET /clients/{id} should return client from database")
+    @SqlGroup({
+            @Sql(executionPhase = BEFORE_TEST_METHOD, scripts = {"getClientsIdShouldReturnClientFromDatabase.sql"}),
+            @Sql(executionPhase = AFTER_TEST_METHOD, scripts = {"cleanClientTable.sql"})
+    })
+    void getClientsIdShouldReturnClientFromDatabase() {
+        var response = webClient.get().uri(clientsIdUrl.get().formatted(1L)).exchange()
+                .expectBody(ClientResponse.class)
+                .returnResult().getResponseBody();
+        assertThat(response)
+                .hasFieldOrPropertyWithValue("id", 1L)
+                .hasFieldOrPropertyWithValue("name", "Client 1");
     }
 
     @Test
@@ -124,6 +159,86 @@ class ClientApiTest {
     }
 
     @Test
+    @DisplayName("IT: PATCH /clients/{id} should return 404 Not found")
+    void patchClientsIdShouldReturn404NotFound() {
+        webClient.patch().uri(clientsIdUrl.get().formatted(1L))
+                .contentType(MediaType.valueOf("application/merge-patch+json"))
+                .bodyValue("{}")
+                .exchange()
+                .expectStatus().isNotFound();
+    }
+
+    @Test
+    @DisplayName("IT: PATCH /clients/{id} should return 200 OK")
+    @SqlGroup({
+            @Sql(executionPhase = BEFORE_TEST_METHOD, scripts = {"patchClientsIdShouldReturn200Ok.sql"}),
+            @Sql(executionPhase = AFTER_TEST_METHOD, scripts = {"cleanClientTable.sql"})
+    })
+    void patchClientsIdShouldReturn200Ok() {
+        webClient.patch().uri(clientsIdUrl.get().formatted(1L))
+                .contentType(MediaType.valueOf("application/merge-patch+json"))
+                .bodyValue("{}")
+                .exchange()
+                .expectStatus().isOk();
+    }
+
+    @Test
+    @DisplayName("IT: PATCH /clients/{id} should ignore unknown fields")
+    @SqlGroup({
+            @Sql(executionPhase = BEFORE_TEST_METHOD, scripts = {"patchClientsIdShouldIgnoreUnknownFields.sql"}),
+            @Sql(executionPhase = AFTER_TEST_METHOD, scripts = {"cleanClientTable.sql"})
+    })
+    void patchClientsIdShouldIgnoreUnknownFields() {
+        webClient.patch().uri(clientsIdUrl.get().formatted(1L))
+                .contentType(MediaType.valueOf("application/merge-patch+json"))
+                .bodyValue("""
+                        {
+                          "ignored": "field"
+                        }
+                        """)
+                .exchange()
+                .expectStatus().isOk();
+    }
+
+    @Test
+    @DisplayName("IT: PATCH /clients/{id} should return client from database")
+    @SqlGroup({
+            @Sql(executionPhase = BEFORE_TEST_METHOD, scripts = {"patchClientsIdShouldReturnClientFromDatabase.sql"}),
+            @Sql(executionPhase = AFTER_TEST_METHOD, scripts = {"cleanClientTable.sql"})
+    })
+    void patchClientsIdShouldReturnClientFromDatabase() {
+        var response = webClient.patch().uri(clientsIdUrl.get().formatted(1L))
+                .contentType(MediaType.valueOf("application/merge-patch+json"))
+                .bodyValue("""
+                        {
+                          "name": "Updated Client"
+                        }
+                        """)
+                .exchange()
+                .expectBody(ClientResponse.class).returnResult().getResponseBody();
+        assertThat(response).hasFieldOrPropertyWithValue("name", "Updated Client");
+    }
+
+    @Test
+    @DisplayName("IT: DELETE /clients/{id} should return 200 OK")
+    void deleteClientsIdShouldReturn200Ok() {
+        webClient.delete().uri(clientsIdUrl.get().formatted(1L)).exchange()
+                .expectStatus().isOk();
+    }
+
+    @Test
+    @DisplayName("IT: DELETE /clients/{id} should delete client from database")
+    @Sql(executionPhase = BEFORE_TEST_METHOD, scripts = {"deleteClientsIdShouldDeleteClientFromDatabase.sql"})
+    void deleteClientsIdShouldDeleteClientFromDatabase() {
+        webClient.get().uri(clientsIdUrl.get().formatted(1L)).exchange()
+                .expectStatus().isOk();
+        webClient.delete().uri(clientsIdUrl.get().formatted(1L)).exchange()
+                .expectStatus().isOk();
+        webClient.get().uri(clientsIdUrl.get().formatted(1L)).exchange()
+                .expectStatus().isNotFound();
+    }
+
+    @Test
     @DisplayName("IT: GET /clients should return client created from POST /clients")
     @Sql(executionPhase = AFTER_TEST_METHOD, scripts = {"cleanClientTable.sql"})
     void getClientsShouldReturnClientCreatedFromPostClients(@Random CreateClientRequest request) {
@@ -135,5 +250,78 @@ class ClientApiTest {
         assertThat(response).asList()
                 .usingRecursiveFieldByFieldElementComparatorIgnoringFields("id")
                 .isEqualTo(List.of(request));
+    }
+
+    @Test
+    @DisplayName("IT: GET /clients/{id} should return client created from POST /clients")
+    @Sql(executionPhase = AFTER_TEST_METHOD, scripts = {"cleanClientTable.sql"})
+    void getClientsIdShouldReturnClientCreatedFromPostClients(@Random CreateClientRequest request) {
+        var client = webClient.post().uri(clientsUrl.get()).bodyValue(request)
+                .exchange().expectBody(ClientResponse.class).returnResult().getResponseBody();
+        var response = webClient.get().uri(clientsIdUrl.get().formatted(client.getId()))
+                .exchange().expectBody(ClientResponse.class).returnResult().getResponseBody();
+        assertThat(response).isEqualTo(client);
+    }
+
+    @Test
+    @DisplayName("IT: GET /clients/{id} should return client updated from PATCH /clients/{id}")
+    @SqlGroup({
+            @Sql(executionPhase = BEFORE_TEST_METHOD, scripts = {"getClientsIdShouldReturnClientUpdatedFromPatchClientsId.sql"}),
+            @Sql(executionPhase = AFTER_TEST_METHOD, scripts = {"cleanClientTable.sql"})
+    })
+    void getClientsIdShouldReturnClientUpdatedFromPatchClientsId() {
+        webClient.patch().uri(clientsIdUrl.get().formatted(1L))
+                .contentType(MediaType.valueOf("application/merge-patch+json"))
+                .bodyValue("""
+                        {
+                          "name": "Updated Client"
+                        }
+                        """)
+                .exchange().expectStatus().isOk();
+        var response = webClient.get().uri(clientsIdUrl.get().formatted(1L))
+                .exchange().expectBody(ClientResponse.class).returnResult().getResponseBody();
+        assertThat(response).hasFieldOrPropertyWithValue("name", "Updated Client");
+    }
+
+    @Test
+    @DisplayName("IT: GET /clients/{id} should return 404 Not found after DELETE /clients/{id}")
+    @Sql(executionPhase = BEFORE_TEST_METHOD, scripts = {"getClientsIdShouldReturn404NotFoundAfterDeleteClientsId.sql"})
+    void getClientsIdShouldReturn404NotFoundAfterDeleteClientsId() {
+        webClient.delete().uri(clientsIdUrl.get().formatted(1L)).exchange()
+                .expectStatus().isOk();
+        webClient.get().uri(clientsIdUrl.get().formatted(1L)).exchange()
+                .expectStatus().isNotFound();
+    }
+
+    @Test
+    @DisplayName("IT: PATCH /clients/{id} should return client after POST /clients")
+    @Sql(executionPhase = AFTER_TEST_METHOD, scripts = {"cleanClientTable.sql"})
+    void patchClientsIdShouldReturnClientAfterPostClients(@Random CreateClientRequest request) {
+        var client = webClient.post().uri(clientsUrl.get()).bodyValue(request)
+                .exchange().expectBody(ClientResponse.class).returnResult().getResponseBody();
+        var response = webClient.patch().uri(clientsIdUrl.get().formatted(client.getId()))
+                .contentType(MediaType.valueOf("application/merge-patch+json"))
+                .bodyValue("""
+                        {
+                          "name": "Updated Client"
+                        }
+                        """)
+                .exchange().expectBody(ClientResponse.class).returnResult().getResponseBody();
+        assertThat(response)
+                .hasFieldOrPropertyWithValue("id", client.getId())
+                .hasFieldOrPropertyWithValue("name", "Updated Client");
+    }
+
+    @Test
+    @DisplayName("IT: PATCH /clients/{id} should return 404 Not found after DELETE /clients/{id}")
+    @Sql(executionPhase = BEFORE_TEST_METHOD, scripts = {"patchClientsIdShouldReturn404NotFoundAfterDeleteClientsId.sql"})
+    void patchClientsIdShouldReturn404NotFoundAfterDeleteClientsId() {
+        webClient.delete().uri(clientsIdUrl.get().formatted(1L)).exchange()
+                .expectStatus().isOk();
+        webClient.patch().uri(clientsIdUrl.get().formatted(1L))
+                .contentType(MediaType.valueOf("application/merge-patch+json"))
+                .bodyValue("{}")
+                .exchange()
+                .expectStatus().isNotFound();
     }
 }

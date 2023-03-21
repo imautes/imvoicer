@@ -6,6 +6,7 @@ import es.imaut.clientapi.exception.ClientNotFoundException;
 import es.imaut.clientapi.service.ClientService;
 import io.github.glytching.junit.extension.random.Random;
 import io.github.glytching.junit.extension.random.RandomBeansExtension;
+import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,6 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import javax.json.JsonMergePatch;
 import java.util.List;
 
+import static java.util.Collections.emptySet;
 import static javax.json.Json.createMergePatch;
 import static javax.json.Json.createObjectBuilder;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -126,6 +128,15 @@ class ClientControllerTest {
                 .thenThrow(new ClientNotFoundException());
         assertThatThrownBy(() -> controller.update(1L, createMergePatch(createObjectBuilder().build())))
                 .isInstanceOf(ClientNotFoundException.class);
+    }
+
+    @Test
+    @DisplayName("Update should throw constraint violation exception")
+    void updateShouldThrowClientConstraintViolationException() {
+        when(service.update(anyLong(), any(JsonMergePatch.class)))
+                .thenThrow(new ConstraintViolationException(emptySet()));
+        assertThatThrownBy(() -> controller.update(1L, createMergePatch(createObjectBuilder().add("name", "").build())))
+                .isInstanceOf(ConstraintViolationException.class);
     }
 
     @Test

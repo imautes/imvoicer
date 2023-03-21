@@ -169,6 +169,36 @@ class ClientApiTest {
     }
 
     @Test
+    @DisplayName("IT: PATCH /clients/{id} should return 400 Bad Request")
+    @SqlGroup({
+            @Sql(executionPhase = BEFORE_TEST_METHOD, scripts = {"patchClientsIdShouldReturn400BadRequest.sql"}),
+            @Sql(executionPhase = AFTER_TEST_METHOD, scripts = {"cleanClientTable.sql"})
+    })
+    void patchClientsIdShouldReturn400BadRequest() {
+        webClient.patch().uri(clientsIdUrl.get().formatted(1L))
+                .contentType(MediaType.valueOf("application/merge-patch+json"))
+                .bodyValue("""
+                        {
+                          "name": null
+                        }
+                        """)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody().json("""
+                        {
+                          "errors": [
+                            {
+                              "code": "NotBlank",
+                              "rejectedValue": null,
+                              "field": "name",
+                              "objectName": "client"
+                            }
+                          ]
+                        }
+                        """);
+    }
+
+    @Test
     @DisplayName("IT: PATCH /clients/{id} should return 200 OK")
     @SqlGroup({
             @Sql(executionPhase = BEFORE_TEST_METHOD, scripts = {"patchClientsIdShouldReturn200Ok.sql"}),

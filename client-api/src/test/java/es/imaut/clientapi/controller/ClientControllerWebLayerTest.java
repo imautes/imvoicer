@@ -7,6 +7,7 @@ import es.imaut.clientapi.exception.ClientNotFoundException;
 import es.imaut.clientapi.service.ClientService;
 import io.github.glytching.junit.extension.random.Random;
 import io.github.glytching.junit.extension.random.RandomBeansExtension;
+import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,6 +19,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import javax.json.JsonMergePatch;
 import java.util.List;
 
+import static java.util.Collections.emptySet;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
@@ -129,6 +131,21 @@ class ClientControllerWebLayerTest {
                 .content("{}");
         mvc.perform(request)
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("PATCH /clients/{id} should return 400 Bad Request")
+    void patchClientsIdShouldReturn400BadRequest() throws Exception {
+        when(service.update(anyLong(), any(JsonMergePatch.class))).thenThrow(new ConstraintViolationException(emptySet()));
+        var request = patch("/clients/1")
+                .contentType("application/merge-patch+json")
+                .content("""
+                        {
+                          "name": ""
+                        }
+                        """);
+        mvc.perform(request)
+                .andExpect(status().isBadRequest());
     }
 
     @Test

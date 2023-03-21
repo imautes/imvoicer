@@ -10,4 +10,9 @@ import lombok.NoArgsConstructor;
 public class ClientResponse {
     private Long id;
     private String name;
+    private String vatNumber;
+    private String streetAddress;
+    private String postcode;
+    private String city;
+    private String country;
 }

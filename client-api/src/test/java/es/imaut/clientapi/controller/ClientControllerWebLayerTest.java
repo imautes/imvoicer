@@ -1,12 +1,12 @@
 package es.imaut.clientapi.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import es.imaut.clientapi.RandomClientExtension;
 import es.imaut.clientapi.domain.ClientResponse;
 import es.imaut.clientapi.domain.CreateClientRequest;
 import es.imaut.clientapi.exception.ClientNotFoundException;
 import es.imaut.clientapi.service.ClientService;
 import io.github.glytching.junit.extension.random.Random;
-import io.github.glytching.junit.extension.random.RandomBeansExtension;
 import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,7 +27,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = { ClientController.class })
-@ExtendWith({ RandomBeansExtension.class })
+@ExtendWith({ RandomClientExtension.class })
 class ClientControllerWebLayerTest {
     @Autowired
     private MockMvc mvc;
@@ -101,6 +101,11 @@ class ClientControllerWebLayerTest {
         var body = """
                 {
                   "name": "Name",
+                  "vatNumber": "1234567890",
+                  "streetAddress": "1 Main street",
+                  "postcode": "PC01",
+                  "city": "Capital",
+                  "country": "Abroad",
                   "ignored": "field"
                 }""";
         var request = post("/clients")

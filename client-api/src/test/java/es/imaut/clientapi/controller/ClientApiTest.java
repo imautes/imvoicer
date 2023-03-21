@@ -1,10 +1,10 @@
 package es.imaut.clientapi.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import es.imaut.clientapi.RandomClientExtension;
 import es.imaut.clientapi.domain.ClientResponse;
 import es.imaut.clientapi.domain.CreateClientRequest;
 import io.github.glytching.junit.extension.random.Random;
-import io.github.glytching.junit.extension.random.RandomBeansExtension;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,7 +30,7 @@ import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.BEFORE_TE
 
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 @AutoConfigureWebTestClient
-@ExtendWith({ RandomBeansExtension.class })
+@ExtendWith({ RandomClientExtension.class })
 @ActiveProfiles("test")
 class ClientApiTest {
     private static final Function<Integer, String> url = port -> "http://localhost:" + port;
@@ -67,9 +67,9 @@ class ClientApiTest {
                 .expectBodyList(ClientResponse.class)
                 .hasSize(3)
                 .contains(
-                        new ClientResponse(1L, "Client 1"),
-                        new ClientResponse(2L, "Client 2"),
-                        new ClientResponse(3L, "Client 3")
+                        new ClientResponse(1L, "Client 1", "1234567890", "1 Main street", "PC01", "Capital", "Abroad"),
+                        new ClientResponse(2L, "Client 2", "2345678901", "2 Main street", "PC02", "Village", "Inland"),
+                        new ClientResponse(3L, "Client 3", "3456789012", "3 Main street", "PC03", "Town", "Overseas")
                 );
     }
 
@@ -128,6 +128,36 @@ class ClientApiTest {
                               "rejectedValue": null,
                               "field": "name",
                               "objectName": "createClientRequest"
+                            },
+                            {
+                              "code": "NotBlank",
+                              "rejectedValue": null,
+                              "field": "vatNumber",
+                              "objectName": "createClientRequest"
+                            },
+                            {
+                              "code": "NotBlank",
+                              "rejectedValue": null,
+                              "field": "streetAddress",
+                              "objectName": "createClientRequest"
+                            },
+                            {
+                              "code": "NotBlank",
+                              "rejectedValue": null,
+                              "field": "postcode",
+                              "objectName": "createClientRequest"
+                            },
+                            {
+                              "code": "NotBlank",
+                              "rejectedValue": null,
+                              "field": "city",
+                              "objectName": "createClientRequest"
+                            },
+                            {
+                              "code": "NotBlank",
+                              "rejectedValue": null,
+                              "field": "country",
+                              "objectName": "createClientRequest"
                             }
                           ]
                         }
@@ -141,6 +171,11 @@ class ClientApiTest {
         webClient.post().uri(clientsUrl.get()).contentType(APPLICATION_JSON).bodyValue("""
                         {
                           "name": "Client name",
+                          "vatNumber": "1234567890",
+                          "streetAddress": "1 Main street",
+                          "postcode": "PC01",
+                          "city": "Capital",
+                          "country": "Abroad",
                           "ignored": "field"
                         }
                         """).exchange()

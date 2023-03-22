@@ -1,0 +1,24 @@
+management:
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    enabled-by-default: true
+    web:
+      exposure:
+        include: '*'
+
+server:
+  error:
+    include-binding-errors: always
+    include-message: always
+
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: validate
+  datasource:
+    url: jdbc:mysql://localhost:3306/account-api
+    username: account-api
+    password: account-api
+    driver-class-name: com.mysql.cj.jdbc.Driver

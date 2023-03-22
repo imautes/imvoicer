@@ -1,7 +1,7 @@
 package es.imaut.productapi.service;
 
-import es.imaut.productapi.domain.ProductResponse;
 import es.imaut.productapi.domain.CreateProductRequest;
+import es.imaut.productapi.domain.ProductResponse;
 import es.imaut.productapi.exception.ProductNotFoundException;
 import es.imaut.productapi.mapper.ProductDetailsMapper;
 import es.imaut.productapi.mapper.ProductMapper;

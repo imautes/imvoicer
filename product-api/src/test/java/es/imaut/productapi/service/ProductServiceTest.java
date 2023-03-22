@@ -8,7 +8,6 @@ import es.imaut.productapi.mapper.ProductMapper;
 import es.imaut.productapi.mapper.ProductMapperImpl;
 import es.imaut.productapi.model.Product;
 import es.imaut.productapi.repository.ProductRepository;
-import es.imaut.productapi.service.ProductService;
 import io.github.glytching.junit.extension.random.Random;
 import io.github.glytching.junit.extension.random.RandomBeansExtension;
 import org.junit.jupiter.api.DisplayName;

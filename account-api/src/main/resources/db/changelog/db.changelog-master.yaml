@@ -1,0 +1,9 @@
+databaseChangeLog:
+  - include:
+      file: db/changelog/account/001-create-account-table.xml
+  - include:
+      file: db/changelog/account/002-extend-account-table.xml
+  - include:
+      file: db/changelog/account/003-create-bank-details-table.xml
+  - include:
+      file: db/changelog/account/004-extend-bank-details-table.xml

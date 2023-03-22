@@ -1,6 +1,5 @@
 package es.imaut.productapi.converter;
 
-import es.imaut.productapi.converter.JsonMergePatchConverter;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,8 +11,10 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
 
 import javax.json.JsonMergePatch;
-
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 import static javax.json.Json.createMergePatch;
 import static javax.json.Json.createObjectBuilder;

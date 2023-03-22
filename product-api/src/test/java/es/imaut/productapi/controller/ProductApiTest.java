@@ -2,8 +2,8 @@ package es.imaut.productapi.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import es.imaut.productapi.RandomProductExtension;
-import es.imaut.productapi.domain.ProductResponse;
 import es.imaut.productapi.domain.CreateProductRequest;
+import es.imaut.productapi.domain.ProductResponse;
 import io.github.glytching.junit.extension.random.Random;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

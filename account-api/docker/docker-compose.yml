@@ -1,0 +1,27 @@
+version: '3.3'
+services:
+  mysql:
+    env_file:
+      - db.env
+    container_name: ${MYSQL_CONTAINER}
+    image: mysql
+    restart: always
+    ports:
+      - '${MYSQL_PORT}:3306'
+    expose:
+      - '${MYSQL_PORT}'
+    volumes:
+      - db:/var/lib/mysql
+  application:
+    env_file:
+      - app.env
+    container_name: ${APPLICATION_CONTAINER}
+    build: ../
+    ports:
+      - '${APPLICATION_PORT}:8080'
+    expose:
+      - '${APPLICATION_PORT}'
+    profiles:
+      - app
+volumes:
+  db:

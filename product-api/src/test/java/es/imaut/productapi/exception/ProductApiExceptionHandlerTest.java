@@ -1,6 +1,5 @@
 package es.imaut.productapi.exception;
 
-import es.imaut.productapi.exception.ProductApiExceptionHandler;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validator;
 import jakarta.validation.constraints.NotNull;

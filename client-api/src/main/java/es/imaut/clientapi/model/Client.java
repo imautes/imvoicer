@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
-import org.hibernate.Hibernate;
 
 import java.util.Objects;
 
@@ -52,14 +51,14 @@ public class Client {
     @Generated
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        if (o == null || getClass() != o.getClass()) return false;
         Client client = (Client) o;
-        return id != null && Objects.equals(id, client.id);
+        return Objects.equals(id, client.id);
     }
 
     @Override
     @Generated
     public int hashCode() {
-        return getClass().hashCode();
+        return Objects.hash(id);
     }
 }

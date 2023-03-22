@@ -5,7 +5,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
-import org.hibernate.Hibernate;
 
 import java.math.BigDecimal;
 import java.util.Objects;
@@ -48,14 +47,14 @@ public class Product {
     @Generated
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        if (o == null || getClass() != o.getClass()) return false;
         Product product = (Product) o;
-        return id != null && Objects.equals(id, product.id);
+        return Objects.equals(id, product.id);
     }
 
     @Override
     @Generated
     public int hashCode() {
-        return getClass().hashCode();
+        return Objects.hash(id);
     }
 }

@@ -1,7 +1,6 @@
 package es.imaut.productapi.mapper;
 
 import es.imaut.productapi.config.ObjectMapperConfig;
-import es.imaut.productapi.mapper.ProductMapper;
 import es.imaut.productapi.model.Product;
 import io.github.glytching.junit.extension.random.Random;
 import io.github.glytching.junit.extension.random.RandomBeansExtension;

@@ -2,8 +2,8 @@ package es.imaut.productapi.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import es.imaut.productapi.RandomProductExtension;
-import es.imaut.productapi.domain.ProductResponse;
 import es.imaut.productapi.domain.CreateProductRequest;
+import es.imaut.productapi.domain.ProductResponse;
 import es.imaut.productapi.exception.ProductNotFoundException;
 import es.imaut.productapi.service.ProductService;
 import io.github.glytching.junit.extension.random.Random;

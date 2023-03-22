@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.4.xsd">
+    <changeSet author="imosonyi" id="004">
+        <addColumn tableName="bank_details">
+            <column name="iban" type="varchar(24)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="bic" type="varchar(8)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="bank_name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="account_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        <addForeignKeyConstraint baseTableName="bank_details"
+                                 baseColumnNames="account_id"
+                                 constraintName="fk_bankdetails_account"
+                                 referencedTableName="account"
+                                 referencedColumnNames="id"
+                                 validate="true"/>
+    </changeSet>
+</databaseChangeLog>

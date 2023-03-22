@@ -1,7 +1,7 @@
 package es.imaut.productapi.controller;
 
-import es.imaut.productapi.domain.ProductResponse;
 import es.imaut.productapi.domain.CreateProductRequest;
+import es.imaut.productapi.domain.ProductResponse;
 import es.imaut.productapi.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
